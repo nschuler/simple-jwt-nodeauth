@@ -44,3 +44,12 @@ export const passwordResetValidations = [
     .exists()
     .isLength({ min: 8 }),
 ];
+
+export const passwordChangeValidations = [
+  check('oldPassword', 'Old Password must be over 8 characters')
+    .exists()
+    .isLength({ min: 8 }),
+  check('newPassword', 'New Password must be over 8 characters')
+    .exists()
+    .isLength({ min: 8 }),
+];

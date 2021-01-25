@@ -181,20 +181,17 @@ export const resetPassword = async (req, res, next) => {
             errors: validationErrors.errors,
         });
 
-        const { email, token, newPassword } = req.body;
+        const { email, reqToken, newPassword } = req.body;
 
-        const tokenExist = await Token.findOne({ token: req.body.token })
+        const tokenExist = await Token.findOne({ token: reqToken })
         if (!tokenExist) return res.status(401).json({ message: 'Unable to find a matching token' });
 
         // Find user based on email
-        const userExist = await User.findOne({ email: req.body.email });
+        const userExist = await User.findOne({ email });
         if (!userExist) return res.status(401).json({ message: 'Account does not exist' });
 
         // Emnsure new password is not the same as old
-        const passwordCompare = await bcrypt.compare(
-            newPassword,
-            useExist.password
-        )
+        const passwordCompare = await bcrypt.compare(newPassword, useExist.password);
 
         if (passwordCompare) return res.status(401).json({ message: 'Cannot use the same password again' });
 
@@ -203,6 +200,38 @@ export const resetPassword = async (req, res, next) => {
         await userExist.save();
 
         return res.status(200).json({ message: "Successfully Reset Password" })
+    } catch (err) {
+        console.log(err);
+        res.status(500).json(err);
+    }
+};
+
+export const changePassword = async (req, res, next) => {
+    try {
+        // Validate data before verifying a user
+        const validationErrors = validationResult(req);
+        if(!validationErrors.isEmpty()) return res.status(400).json({
+            message: 'Invalid data, see response.data.errors for further information',
+            errors: validationErrors.errors,
+        });
+
+        const { newPassword, oldPassword } = req.body;
+
+        if (newPassword == oldPassword) return res.status(401).json({ message: 'New and Current password is identical' });
+
+        // Find user based on email
+        const userExist = await User.findOne({ _id: req.user._id });
+        if (!userExist) return res.status(401).json({ message: 'Account does not exist' });
+
+        // Emnsure new password is not the same as old
+        const passwordCompare = await bcrypt.compare(oldPassword, userExist.password);
+
+        if (passwordCompare) return res.status(401).json({ message: 'Cannot use the same password again' });
+
+        userExist.password = passwordEncrypt(newPassword);
+        await userExist.save();
+
+        return res.status(200).json({ message: "Password Changed Successfully" })
     } catch (err) {
         console.log(err);
         res.status(500).json(err);
