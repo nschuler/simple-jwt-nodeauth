@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken")
+import jwt from 'jsonwebtoken';
 
 const secret = process.env.JWT_SECRET || 'secret';
 
@@ -6,7 +6,7 @@ export const generateToken = (id) => {
     return jwt.sign({ id }, new Buffer.from(secret, 'base64'), { expiresIn: '1h' });
 };
   
-export const authenticateToken = function (req, res, next) {
+export const authenticateToken = (req, res, next) => {
     try {
         const token = req.header("auth-token")
         if (!token) return response.status(401).json({ message: 'No Authentication token provided' });

@@ -1,18 +1,16 @@
-const router = require("express").Router()
-const jwt = require("jsonwebtoken")
-const bcrypt = require("bcryptjs")
+import bcrypt from 'bcrypt';
+import { validationResult } from 'express-validator';
 
-const User = require("../models/User")
+import User from '../models/User.js';
 import { generateToken } from './../middleware/authToken.js';
-const { registerValidation, loginValidation } = require("../validation")
 
-router.post("/register", async (req, res) => {
+export const register = async (req, res, next) => {
     try {
         // Validate data before creating a user
-        const { error } = registerValidation(req.body)
-        if (error) return res.status(400).json({
+        const validationErrors = validationResult(request);
+        if(!validationErrors.isEmpty()) return response.status(400).json({
             message: 'Invalid data, see response.data.errors for further information',
-            errors: error.details[0].message
+            errors: validationErrors.errors,
         })
 
         // Check if email already exists
@@ -43,16 +41,16 @@ router.post("/register", async (req, res) => {
         console.log(err);
         response.status(500).json(err)
     }
-});
+};
 
-router.post("/login", async (req, res) => {
+export const login = async (req, res, next) => {
     try {
         // Validate data before logging in a user
-        const { error } = loginValidation(req.body)
-        if (error) return res.status(400).json({
+        const validationErrors = validationResult(request);
+        if(!validationErrors.isEmpty()) return response.status(400).json({
             message: 'Invalid data, see response.data.errors for further information',
-            errors: error.details[0].message
-        })
+            errors: validationErrors.errors,
+        });
 
         // Find user based on email
         const userExist = await User.findOne({ email: req.body.email });
@@ -71,6 +69,4 @@ router.post("/login", async (req, res) => {
         console.log(err);
         response.status(500).json(err);
     }
-});
-
-module.exports = router
+};

@@ -1,8 +1,10 @@
-const express = require("express")
-const mongoose = require("mongoose")
-const dotenv = require("dotenv")
-const bodyParser = require("body-parser")
-const cors = require("cors")
+import mongoose from 'mongoose'; // MongoDB (database)
+import express from 'express'; // Backend App (server)
+import dotenv from 'dotenv'; // Secures content
+import cors from 'cors'; // HTTP headers
+import bodyParser from 'body-parser';
+
+import accountRoutes from './routes/account.js';
 
 // Initialize app
 const app = express();
@@ -26,6 +28,8 @@ mongoose.set('useCreateIndex', true);
 
 // Routes
 app.get('/', (req, res) => res.send('Simple JWT Node Auth API is Online'));
+app.use("/api/account", accountRoutes)
+// app.use("/api/post", postRoute)
 
 // server is listening for requests
 app.listen(PORT, () => console.log(`✅ Server is listening on port: ${PORT}`))
