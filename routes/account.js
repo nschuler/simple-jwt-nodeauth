@@ -1,11 +1,14 @@
 import express from 'express';
 
+import { authenticateToken } from '../middleware/authToken.js';
 import { registerValidations, loginValidations, tokenValidations, resendTokenValidations, passwordResetValidations, passwordChangeValidations } from './../middleware/validateUser.js';
-import { register, login, verify, resendToken, sendResetToken, resetPassword,changePassword } from '../controllers/account.js'; // import request & response function
+import { register, login, verify, resendToken, sendResetToken, resetPassword,changePassword, getAllUsers, getAllActiveUsers } from '../controllers/account.js'; // import request & response function
 
 // initialize router
 const router = express.Router();
 
+router.get('/', authenticateToken, getAllUsers) // current path: http://localhost:8080/api/account/
+router.get('/active', authenticateToken, getAllActiveUsers) // current path: http://localhost:8080/api/account/active
 router.post('/register', [...registerValidations], register); // current path: http://localhost:8080/api/account/register
 router.post('/login', [...loginValidations], login); // current path: http://localhost:8080/api/account/login
 router.post('/verify', [...tokenValidations], verify); // current path: http://localhost:8080/api/account/verify

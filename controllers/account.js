@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
 
 import User from '../models/User.js';
@@ -72,7 +71,7 @@ export const login = async (req, res, next) => {
         const token = generateAuthToken(userExist._id);
 
         // Return token
-        res.status(200).header("auth-token", token).json({ message: 'Login Success', token })
+        res.status(200).json({ message: 'Login Success', access_token: token })
     } catch (err) {
         console.log(err);
         res.status(500).json(err);
@@ -189,7 +188,7 @@ export const resetPassword = async (req, res, next) => {
         if (!tokenExist) return res.status(401).json({ message: 'Unable to find a matching token' });
 
         // Find user based on email
-        const userExist = await User.findOne({ email });
+        const userExist = await User.findOne({ email }.select('+password'));
         if (!userExist) return res.status(401).json({ message: 'Account does not exist' });
 
         // Emnsure new password is not the same as old
@@ -222,7 +221,7 @@ export const changePassword = async (req, res, next) => {
         if (newPassword == oldPassword) return res.status(401).json({ message: 'New and Current password is identical' });
 
         // Find user based on email
-        const userExist = await User.findOne({ _id: req.user._id });
+        const userExist = await User.findOne({ _id: req.user._id }).select('+password');;
         if (!userExist) return res.status(401).json({ message: 'Account does not exist' });
 
         // Emnsure new password is not the same as old
@@ -234,6 +233,26 @@ export const changePassword = async (req, res, next) => {
         await userExist.save();
 
         return res.status(200).json({ message: "Password Changed Successfully" })
+    } catch (err) {
+        console.log(err);
+        res.status(500).json(err);
+    }
+};
+
+export const getAllUsers  = async (req, res, next) => {
+    try {
+        const users = await User.find({});
+        return res.status(200).json({ data: users })
+    } catch (err) {
+        console.log(err);
+        res.status(500).json(err);
+    }
+};
+
+export const getAllActiveUsers  = async (req, res, next) => {
+    try {
+        const users = await User.find({ isActive: true });
+        return res.status(200).json({ data: users })
     } catch (err) {
         console.log(err);
         res.status(500).json(err);
