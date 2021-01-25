@@ -19,3 +19,11 @@ export const loginValidations = [
       .exists()
       .isLength({ min: 8 }),
   ];
+
+export const tokenValidations = [
+    check('email', 'Email is not valid')
+      .exists()
+      .isEmail(),
+    check('token', 'Token does not exist')
+      .exists(),
+];

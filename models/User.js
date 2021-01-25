@@ -23,7 +23,11 @@ const instance = new mongoose.Schema(
       required: true,
       min: 8,
       max: 1024,
-    }
+    },
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true

@@ -2,6 +2,8 @@ import bcrypt from 'bcrypt';
 import { validationResult } from 'express-validator';
 
 import User from '../models/User.js';
+import Token from '../models/Token.js';
+
 import { generateToken } from './../middleware/authToken.js';
 
 export const register = async (req, res, next) => {
@@ -65,6 +67,35 @@ export const login = async (req, res, next) => {
 
         // Return token
         response.status(200).header("auth-token", token).json({ message: 'Login Success', token })
+    } catch (err) {
+        console.log(err);
+        response.status(500).json(err);
+    }
+};
+
+export const verify = async (req, res, next) => {
+    try {
+        // Validate data before verifying a user
+        const validationErrors = validationResult(request);
+        if(!validationErrors.isEmpty()) return response.status(400).json({
+            message: 'Invalid data, see response.data.errors for further information',
+            errors: validationErrors.errors,
+        });
+
+        const tokenExist = await Token.findOne({ token: req.body.token })
+        if (!tokenExist) return response.status(401).json({ message: 'Unable to find a matching token' });
+
+        // Find user based on email
+        const userExist = await User.findOne({ email: req.body.email });
+        if (!userExist) return response.status(401).json({ message: 'Account does not exist' });
+
+        if (userExist.isActive) return res.status(401).json({ message: "User already verified" })
+
+        userExist.isActive = true;
+        await userExist.save();
+
+        // Delete token if user is verified
+        await token.deleteOne()
     } catch (err) {
         console.log(err);
         response.status(500).json(err);
