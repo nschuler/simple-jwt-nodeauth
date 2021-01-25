@@ -33,11 +33,16 @@ export const register = async (req, res, next) => {
 
         // Save new user
         const savedUser = await newUser.save();
-
         console.log('Account created', savedUser);
+
+        // Generate and send token
+        const token = await randomTokenGen()
+        const userToken = new Token({ _userId: savedUser._id, token: token })
+        await userToken.save()
+
         response.status(201).json({
             message: 'Account created successfully!',
-            email: savedUser.email,
+            data: savedUser,
         })
     } catch (err) {
         console.log(err);
@@ -95,7 +100,7 @@ export const verify = async (req, res, next) => {
         await userExist.save();
 
         // Delete token if user is verified
-        await token.deleteOne()
+        return res.status(200).json({ message: "Successfully Verified Account" })
     } catch (err) {
         console.log(err);
         response.status(500).json(err);
