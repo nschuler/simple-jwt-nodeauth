@@ -27,3 +27,20 @@ export const tokenValidations = [
     check('token', 'Token does not exist')
       .exists(),
 ];
+
+export const resendTokenValidations = [
+  check('email', 'Email is not valid')
+    .exists()
+    .isEmail(),
+];
+
+export const passwordResetValidations = [
+  check('email', 'Email is not valid')
+    .exists()
+    .isEmail(),
+  check('token', 'Token is not valid')
+    .exists(),
+  check('password', 'Password must be over 8 characters')
+    .exists()
+    .isLength({ min: 8 }),
+];

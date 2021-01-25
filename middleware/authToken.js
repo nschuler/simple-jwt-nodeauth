@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 const secret = process.env.JWT_SECRET || 'secret';
 
-export const generateToken = (id) => {
+export const generateAuthToken = (id) => {
     return jwt.sign({ id }, new Buffer.from(secret, 'base64'), { expiresIn: '1h' });
 };
   
