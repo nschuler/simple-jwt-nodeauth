@@ -23,7 +23,7 @@ export const register = async (req, res, next) => {
         if (foundEmail) return res.status(400).json({ message: 'That email is already taken', email: foundUser.email });
 
         // Encrypt password
-        const encryptedPassword = passwordEncrypt(req.body.password)
+        const encryptedPassword = await passwordEncrypt(req.body.password)
 
         // Create a new user
         const newUser = new User({
@@ -99,6 +99,8 @@ export const verify = async (req, res, next) => {
 
         userExist.isActive = true;
         await userExist.save();
+        // Delete token if user is verified
+        await tokenExist.remove();
 
         return res.status(200).json({ message: "Successfully Verified Account" })
     } catch (err) {
@@ -196,7 +198,7 @@ export const resetPassword = async (req, res, next) => {
         if (passwordCompare) return res.status(401).json({ message: 'Cannot use the same password again' });
 
 
-        userExist.password = passwordEncrypt(newPassword);
+        userExist.password = await passwordEncrypt(newPassword);
         await userExist.save();
 
         return res.status(200).json({ message: "Successfully Reset Password" })
@@ -228,7 +230,7 @@ export const changePassword = async (req, res, next) => {
 
         if (passwordCompare) return res.status(401).json({ message: 'Cannot use the same password again' });
 
-        userExist.password = passwordEncrypt(newPassword);
+        userExist.password = await passwordEncrypt(newPassword);
         await userExist.save();
 
         return res.status(200).json({ message: "Password Changed Successfully" })
