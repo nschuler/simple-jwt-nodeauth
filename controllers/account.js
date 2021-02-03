@@ -60,7 +60,7 @@ export const login = async (req, res, next) => {
         });
 
         // Find user based on email
-        const userExist = await User.findOne({ email: req.body.email });
+        const userExist = await User.findOne({ email: req.body.email }).select('+password');
         if (!userExist) return res.status(401).json({ message: 'Account does not exist' });
 
         // If user exists validate password

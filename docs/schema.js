@@ -12,11 +12,14 @@
  *          id:
  *             type: string
  *             readOnly: true
- *          name:
+ *          firstName:
  *            type: string
- *            description: The user fullname
- *            minimum: 6
- *            maximum: 1024
+ *            description: The user first name
+ *            maximum: 255
+ *          lastName:
+ *            type: string
+ *            description: The user last name
+ *            maximum: 255
  *          email:
  *            type: string
  *            format: email
@@ -34,12 +37,9 @@
  *             type: Boolean
  *             description: Status of user verification
  *             readOnly: true
- *          Date:
- *             type: Date
- *             description: User regisration date
- *             readOnly: true
  *        example:
- *           name: Alexander
+ *           firstName: Alexander
+ *           lastName: Smith
  *           email: fake@email.com
  *           password: passwordpassword
  */
